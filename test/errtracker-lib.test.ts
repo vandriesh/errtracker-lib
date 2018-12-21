@@ -1,14 +1,20 @@
-import DummyClass from "../src/errtracker-lib"
+import { ErrTracker, ErrTrackerHandler } from '../src/errtracker';
 
 /**
- * Dummy test
+ * ErrTracker
  */
-describe("Dummy test", () => {
-  it("works if true is truthy", () => {
-    expect(true).toBeTruthy()
-  })
+describe('ErrTracker', () => {
+  it('works if true is truthy', () => {
+    expect(true).toBeTruthy();
+  });
 
-  it("DummyClass is instantiable", () => {
-    expect(new DummyClass()).toBeInstanceOf(DummyClass)
-  })
-})
+  it('ErrTracker is instantiable', () => {
+    const HandlerMock: ErrTrackerHandler = {
+      handle: () => {
+        return;
+      }
+    };
+
+    expect(new ErrTracker(HandlerMock)).toBeInstanceOf(ErrTracker);
+  });
+});

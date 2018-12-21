@@ -1,24 +1,31 @@
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
-import sourceMaps from 'rollup-plugin-sourcemaps'
-import camelCase from 'lodash.camelcase'
-import typescript from 'rollup-plugin-typescript2'
-import json from 'rollup-plugin-json'
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+import sourceMaps from 'rollup-plugin-sourcemaps';
+import camelCase from 'lodash.camelcase';
+import typescript from 'rollup-plugin-typescript2';
+import json from 'rollup-plugin-json';
+import { uglify } from 'rollup-plugin-uglify';
 
-const pkg = require('./package.json')
+const pkg = require('./package.json');
 
-const libraryName = 'errtracker-lib'
+const libraryName = 'errtracker-lib';
 
-export default {
+const rollupDefaultOptions = {
   input: `src/${libraryName}.ts`,
   output: [
-    { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
-    { file: pkg.module, format: 'es', sourcemap: true },
+    // { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
+    // { file: pkg.module, format: 'es', sourcemap: true }
+    {
+      file: pkg.module,
+      name: camelCase(libraryName),
+      format: 'iife',
+      sourcemap: true
+    }
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: [],
   watch: {
-    include: 'src/**',
+    include: 'src/**'
   },
   plugins: [
     // Allow json resolution
@@ -33,6 +40,20 @@ export default {
     resolve(),
 
     // Resolve source maps to the original source
-    sourceMaps(),
-  ],
-}
+    sourceMaps()
+  ]
+};
+
+export default [
+  { ...rollupDefaultOptions },
+  {
+    ...rollupDefaultOptions,
+    output: [
+      {
+        ...rollupDefaultOptions.output[0],
+        file: pkg.min
+      }
+    ],
+    plugins: [...rollupDefaultOptions.plugins, uglify()]
+  }
+];
