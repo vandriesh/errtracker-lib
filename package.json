@@ -1,8 +1,13 @@
 {
   "name": "errtracker-lib",
   "version": "0.0.1",
-  "description": "",
-  "keywords": [],
+  "description": "A small lib to catch error and handle it.",
+  "keywords": [
+    "javascripts",
+    "error",
+    "track",
+    "notify"
+  ],
   "main": "dist/errtracker-lib.umd.js",
   "module": "dist/errtracker-lib.es5.js",
   "min": "dist/errtracker-lib.min.es5.js",
