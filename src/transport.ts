@@ -1,4 +1,8 @@
 export function postData(url = ``, data = {}): Promise<Response> {
+  if (!url) {
+    return Promise.resolve({} as Response);
+  }
+
   // Default options are marked with *
   return fetch(url, {
     method: 'POST',
