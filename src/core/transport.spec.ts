@@ -1,4 +1,4 @@
-import { postData } from '../src/transport';
+import { postData } from './fetch-transport';
 
 const globalAny: any = global;
 /**
@@ -9,12 +9,11 @@ describe('Transport', () => {
   let mockFetchPromise: Promise<object>;
 
   beforeEach(() => {
-    globalAny.fetch = jest.fn().mockImplementation(() => mockFetchPromise); // 4;
     mockSuccessResponse = { a: 1, b: 2 };
     mockFetchPromise = Promise.resolve({
-      // 3
       json: () => mockSuccessResponse
     });
+    globalAny.fetch = jest.fn().mockImplementation(() => mockFetchPromise); // 4;
   });
 
   afterEach(() => {
@@ -58,8 +57,9 @@ describe('Transport', () => {
       body: JSON.stringify(data) // body data type must match "Content-Type" header
     });
   });
+
   it('should return imediate resolve object if url is not provided', done => {
-    postData().then(resp => {
+    postData('').then(resp => {
       expect(resp).toEqual({});
       done();
     });
