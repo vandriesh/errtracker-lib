@@ -47,7 +47,8 @@ export class ErrTracker implements ErrorEventHandlerInterface {
       errMsg = event;
     }
 
-    this.handlers.forEach((handler) =>
+    // todo: move to transport?
+    this.handlers.forEach((handler: ErrTrackerHandler) =>
       handler
         .handle(errMsg, Utils.toArray(this.extraInfo))
         .then((resp) => this.config.logger.success(handler.constructor.name, ':ok', resp))
