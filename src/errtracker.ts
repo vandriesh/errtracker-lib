@@ -47,11 +47,11 @@ export class ErrTracker implements ErrorEventHandlerInterface {
       errMsg = event;
     }
 
-    this.handlers.forEach(handler =>
+    this.handlers.forEach((handler) =>
       handler
         .handle(errMsg, Utils.toArray(this.extraInfo))
-        .then(resp => this.config.logger.success(handler.constructor.name, ':ok', resp))
-        .catch(resp => this.config.logger.error(handler.constructor.name, ':fail', resp))
+        .then((resp) => this.config.logger.success(handler.constructor.name, ':ok', resp))
+        .catch((resp) => this.config.logger.error(handler.constructor.name, ':fail', resp))
     );
 
     return true;

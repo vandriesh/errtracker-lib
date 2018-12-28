@@ -23,7 +23,7 @@ describe('Transport', () => {
     expect(postData).toBeDefined();
   });
 
-  it('it should fetch with specific parameters', done => {
+  it('it should fetch with specific parameters', (done) => {
     const mockSuccessResponse = { a: 1, b: 2 };
 
     const data = { x: 1, y: 2, z: 3 };
@@ -53,15 +53,15 @@ describe('Transport', () => {
     });
   });
 
-  it('should return immediate resolve object if url is not provided', done => {
+  it('should return immediate resolve object if url is not provided', (done) => {
     // tslint:disable-next-line:no-floating-promises
-    postData('').then(resp => {
+    postData('').then((resp) => {
       expect(resp).toEqual({});
       done();
     });
 
     // tslint:disable-next-line:no-floating-promises
-    postData('', undefined).then(resp => {
+    postData('', undefined).then((resp) => {
       expect(resp).toEqual({});
       done();
     });
@@ -69,9 +69,9 @@ describe('Transport', () => {
     expect(fetch).toHaveBeenCalledTimes(0);
   });
 
-  it('should fetch without data', done => {
+  it('should fetch without data', (done) => {
     // tslint:disable-next-line:no-floating-promises
-    postData('/another-url').then(res => {
+    postData('/another-url').then((res) => {
       const body: any = res.json();
       expect(body).toEqual(mockSuccessResponse);
 

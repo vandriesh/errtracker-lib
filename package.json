@@ -50,10 +50,6 @@
       "path": "node_modules/cz-conventional-changelog"
     }
   },
-  "prettier": {
-    "semi": true,
-    "singleQuote": true
-  },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
