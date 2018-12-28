@@ -1,4 +1,6 @@
-export function postData(url = ``, data = {}): Promise<Response> {
+export type TransportContract = (url: string, data?: object) => Promise<Response>;
+
+export const postData: TransportContract = (url, data = {}) => {
   if (!url) {
     return Promise.resolve({} as Response);
   }
@@ -17,4 +19,4 @@ export function postData(url = ``, data = {}): Promise<Response> {
     referrer: 'no-referrer',
     body: JSON.stringify(data) // body data type must match "Content-Type" header
   });
-}
+};

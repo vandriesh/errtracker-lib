@@ -1,4 +1,4 @@
-import { ErrTracker, ErrTrackerHandler } from '../src/errtracker';
+import { ErrTracker, ErrTrackerConfig, ErrTrackerHandler } from './errtracker';
 
 /**
  * ErrTracker
@@ -11,10 +11,12 @@ describe('ErrTracker', () => {
   it('ErrTracker is instantiable', () => {
     const HandlerMock: ErrTrackerHandler = {
       handle: () => {
-        return;
+        return new Promise(() => {
+          return '';
+        });
       }
     };
 
-    expect(new ErrTracker(HandlerMock)).toBeInstanceOf(ErrTracker);
+    expect(new ErrTracker(HandlerMock, {} as ErrTrackerConfig)).toBeInstanceOf(ErrTracker);
   });
 });

@@ -1,4 +1,4 @@
-import { postData } from '../src/transport';
+import { postData } from './fetch-transport';
 
 const globalAny: any = global;
 /**
@@ -9,12 +9,11 @@ describe('Transport', () => {
   let mockFetchPromise: Promise<object>;
 
   beforeEach(() => {
-    globalAny.fetch = jest.fn().mockImplementation(() => mockFetchPromise); // 4;
     mockSuccessResponse = { a: 1, b: 2 };
     mockFetchPromise = Promise.resolve({
-      // 3
       json: () => mockSuccessResponse
     });
+    globalAny.fetch = jest.fn().mockImplementation(() => mockFetchPromise); // 4;
   });
 
   afterEach(() => {
@@ -24,21 +23,16 @@ describe('Transport', () => {
     expect(postData).toBeDefined();
   });
 
-  it('it should fetch with specific parameters', () => {
+  it('it should fetch with specific parameters', done => {
     const mockSuccessResponse = { a: 1, b: 2 };
-    // const mockJsonPromise = Promise.resolve(mockSuccessResponse); // 2
-    const mockFetchPromise = Promise.resolve({
-      // 3
-      json: () => mockSuccessResponse
-    });
 
     const data = { x: 1, y: 2, z: 3 };
 
-    // assert on the response
+    // tslint:disable-next-line:no-floating-promises
     postData('/url', data).then((res: Response) => {
       const body: any = res.json();
       expect(body).toEqual(mockSuccessResponse);
-      // done();
+      done();
     });
 
     expect(fetch).toHaveBeenCalledTimes(1);
@@ -58,12 +52,15 @@ describe('Transport', () => {
       body: JSON.stringify(data) // body data type must match "Content-Type" header
     });
   });
-  it('should return imediate resolve object if url is not provided', done => {
-    postData().then(resp => {
+
+  it('should return immediate resolve object if url is not provided', done => {
+    // tslint:disable-next-line:no-floating-promises
+    postData('').then(resp => {
       expect(resp).toEqual({});
       done();
     });
 
+    // tslint:disable-next-line:no-floating-promises
     postData('', undefined).then(resp => {
       expect(resp).toEqual({});
       done();
@@ -73,8 +70,11 @@ describe('Transport', () => {
   });
 
   it('should fetch without data', done => {
-    postData('/another-url').then(resp => {
-      expect(resp.json()).toEqual(mockSuccessResponse);
+    // tslint:disable-next-line:no-floating-promises
+    postData('/another-url').then(res => {
+      const body: any = res.json();
+      expect(body).toEqual(mockSuccessResponse);
+
       done();
     });
 

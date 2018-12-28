@@ -1,7 +1,6 @@
-import { postData } from './transport';
-import { ErrTrackerHandler } from './errtracker';
+import { SlackFormatter } from './slack-handler';
 
-interface ChatPostMessageArguments {
+export interface ChatPostMessageArguments {
   channel: string;
   text: string;
   as_user?: boolean;
@@ -18,7 +17,7 @@ interface ChatPostMessageArguments {
   username?: string; // if specified, as_user must be false
 }
 
-interface MessageAttachment {
+export interface MessageAttachment {
   fallback?: string; // either this or text must be defined
   color?: 'good' | 'warning' | 'danger' | string;
   pretext?: string;
@@ -43,24 +42,14 @@ interface MessageAttachment {
   mrkdwn_in?: ('pretext' | 'text' | 'fields')[];
 }
 
-export class SlackHandler implements ErrTrackerHandler {
-  constructor(private slackUrl: string, private slackChannel: string) {}
-  public handle(errMsg: ErrorEvent, info: string[] = []) {
-    const message = this.format(errMsg, info);
+export class SlackMessageFormatter implements SlackFormatter {
+  constructor(private inputMessage: Partial<ChatPostMessageArguments>) {}
 
-    postData(this.slackUrl, message)
-      .then(resp => console.info(this.constructor.name, 'service provider has been notified'))
-      .catch(resp =>
-        console.error(this.constructor.name, 'ErrTracker: could notify, due to error')
-      );
-  }
-
-  private formatTextAttach(text: string): object {
-    return { text };
-  }
-
-  private format(errorMessage: ErrorEvent, extraInfo: string[]): ChatPostMessageArguments {
-    const attachments = [];
+  private static formatAttachments(
+    errorMessage: ErrorEvent,
+    extraInfo: string[]
+  ): MessageAttachment[] {
+    const attachments: MessageAttachment[] = [];
     const details = [
       `message: ${errorMessage.message}`,
       `source: ${errorMessage.filename}`,
@@ -68,17 +57,29 @@ export class SlackHandler implements ErrTrackerHandler {
       `col: ${errorMessage.colno}`,
       `error: ${errorMessage.error}`
     ];
-    attachments.push(this.formatTextAttach(details.join('\n')));
-    if (extraInfo) {
-      attachments.push(this.formatTextAttach(extraInfo.join('\n')));
-    }
-    const outputMessage: ChatPostMessageArguments = {
-      channel: this.slackChannel,
-      username: 'errtracker',
-      text: 'We got an error!',
-      attachments
-    };
 
-    return outputMessage;
+    attachments.push(this.formatTextAttachment(details.join('\n')));
+
+    if (extraInfo.length) {
+      attachments.push(this.formatTextAttachment(extraInfo.join('\n')));
+    }
+
+    return attachments;
+  }
+
+  private static formatTextAttachment(text: string): MessageAttachment {
+    return { text };
+  }
+
+  public format(errorMessage: ErrorEvent, extraInfo: string[] = []): ChatPostMessageArguments {
+    const attachments: MessageAttachment[] = SlackMessageFormatter.formatAttachments(
+      errorMessage,
+      extraInfo
+    );
+
+    return {
+      ...this.inputMessage,
+      attachments
+    } as ChatPostMessageArguments;
   }
 }
