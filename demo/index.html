@@ -1,0 +1,54 @@
+<html>
+<script src="../dist/errtracker-slack-lib.es5.js"></script>
+<script src="../dist/errtracker-lib.es5.js"></script>
+<script>
+  if (window['slackErrTracker']) {
+    (function(et, d, n){
+      et({
+        webHookUrl: 'https://hooks.slack.com/services/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',
+        details: {
+          platform: n.platform,
+          userAgent: n.userAgent,
+          url: d.location
+        },
+      })
+
+    })(window['slackErrTracker'], window.document, window.navigator)
+  }
+
+  function triggerError(){
+    throw 'my new error!'
+  }
+</script>
+<script>
+  if (window['errtracker']) {
+    (function(et, d, n){
+      et({
+        apiURL: 'https://60hhjhnyr7.execute-api.eu-west-1.amazonaws.com/dev/api/v1/alerts',
+        token: 'fd0d7c6b-7cef-4129-ab9b-5b6bcd1844b3',
+        useConsoleLogger: true,
+        url: d.location,
+        details: {
+          platform: n.platform,
+          userAgent: n.userAgent,
+
+        },
+      })
+
+    })(window['errtracker'], window.document, window.navigator)
+  }
+
+  function triggerAwsError(){
+    throw 'my aws error!'
+  }
+</script>
+<body>
+  to start simple server: python -m SimpleHTTPServer 8080
+
+  <hr>
+
+  <input type="button" onclick="triggerError()" value="send slack notification" />
+  <input type="button" onclick="triggerAwsError()" value="send AWS notification" />
+
+</body>
+</html>

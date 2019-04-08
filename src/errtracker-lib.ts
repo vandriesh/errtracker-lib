@@ -1,45 +1,31 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
-// ...
-import SlackHandler from './handlers/slack/slack-handler';
-import { ErrTracker } from './errtracker';
-import { ChatPostMessageArguments } from './handlers/slack/slack-message-formatter';
+import { ErrTrackerConfig } from './trackers/slack-errtracker';
+import { ConsoleLogger, DummyLogger } from './loggers/loggers';
+import { ETData, MessageBuilder } from './message-builders/message-builder';
+import { subscribeToEventListener, Window } from './core/utils';
 import { postData } from './core/fetch-transport';
 
-(function(scope: any, { platform, userAgent }: Navigator) {
-  const logger = {
-    success: (...args: any[]) => console.log(...args),
-    error: (...args: any[]) => console.warn(...args)
-  };
+(function(scope: Window) {
+  const ERR_TRACKER = 'errtracker';
+  scope[ERR_TRACKER] = (options: ErrTrackerConfig) => {
+    const { token, details, useConsoleLogger } = options;
+    let { logger = DummyLogger, apiURL } = options;
 
-  scope['errtracker'] = {
-    useSlackHandler: (slackWebhookUrl: string, slackChannel: string) => {
-      if (scope['__usingSlackChannel']) {
-        logger.error('errtracker:', 'slack handler is already in use');
-
-        return;
-      }
-
-      const defaultSlackMessage = {
-        channel: slackChannel,
-        username: 'errtracker',
-        text: 'We got an error!'
-      } as Partial<ChatPostMessageArguments>;
-
-      const slackHandler = new SlackHandler(slackWebhookUrl, defaultSlackMessage, postData);
-
-      const ErrTrackerHandler = new ErrTracker(slackHandler, {
-        logger
-      });
-
-      ErrTrackerHandler.setExtraInfo({
-        platform,
-        userAgent
-      });
-
-      scope.addEventListener('error', (event: ErrorEvent) => ErrTrackerHandler.handle(event));
-      scope['__usingSlackChannel'] = true;
-      scope['errtracker'].setExtraInfo = ErrTrackerHandler.setExtraInfo;
+    if (!apiURL) {
+      apiURL = 'https://errtracker.com/prod/api/v1/alerts';
     }
+
+    if (useConsoleLogger) {
+      logger = ConsoleLogger;
+    }
+
+    const basicData: ETData = {
+      details,
+      token,
+      url: window.document.location.href
+    };
+
+    const dataBuilder = new MessageBuilder(basicData);
+
+    subscribeToEventListener({ scope: scope, url: apiURL, builder: dataBuilder, logger: logger, transport: postData });
   };
-})(window, navigator);
+})(window);

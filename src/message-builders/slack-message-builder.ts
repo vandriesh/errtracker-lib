@@ -1,4 +1,4 @@
-import { SlackFormatter } from './slack-handler';
+import { objToArray } from '../core/utils';
 
 export interface ChatPostMessageArguments {
   channel: string;
@@ -42,43 +42,26 @@ export interface MessageAttachment {
   mrkdwn_in?: ('pretext' | 'text' | 'fields')[];
 }
 
-export class SlackMessageFormatter implements SlackFormatter {
-  constructor(private inputMessage: Partial<ChatPostMessageArguments>) {}
+const formatAttachment = (obj: object): MessageAttachment => formatTextAttachment(objToArray(obj).join('\n'));
 
-  private static formatAttachments(
-    errorMessage: ErrorEvent,
-    extraInfo: string[]
-  ): MessageAttachment[] {
-    const attachments: MessageAttachment[] = [];
-    const details = [
-      `message: ${errorMessage.message}`,
-      `source: ${errorMessage.filename}`,
-      `line: ${errorMessage.lineno}`,
-      `col: ${errorMessage.colno}`,
-      `error: ${errorMessage.error}`
-    ];
+const formatTextAttachment = (text: string): MessageAttachment => ({ text });
 
-    attachments.push(this.formatTextAttachment(details.join('\n')));
+export interface ETMessageBuilder<T> {
+  build: (errorEvent: Partial<ErrorEvent>) => T;
+}
 
-    if (extraInfo.length) {
-      attachments.push(this.formatTextAttachment(extraInfo.join('\n')));
+export class SlackMessageBuilder implements ETMessageBuilder<ChatPostMessageArguments> {
+  constructor(private slackMessage: string, private basicData?: object) {}
+
+  public build(errorEvent: Partial<ErrorEvent>): ChatPostMessageArguments {
+    const attachments: MessageAttachment[] = [formatAttachment(errorEvent)];
+
+    if (this.basicData) {
+      attachments.push(formatAttachment(this.basicData));
     }
 
-    return attachments;
-  }
-
-  private static formatTextAttachment(text: string): MessageAttachment {
-    return { text };
-  }
-
-  public format(errorMessage: ErrorEvent, extraInfo: string[] = []): ChatPostMessageArguments {
-    const attachments: MessageAttachment[] = SlackMessageFormatter.formatAttachments(
-      errorMessage,
-      extraInfo
-    );
-
     return {
-      ...this.inputMessage,
+      text: this.slackMessage,
       attachments
     } as ChatPostMessageArguments;
   }
