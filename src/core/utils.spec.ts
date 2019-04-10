@@ -2,8 +2,11 @@ import { objToArray, extractBasicDataFromErrorEvent, subscribeToEventListener } 
 import { MessageBuilder } from '../message-builders/message-builder';
 import { ConsoleLogger } from '../loggers/loggers';
 import { postData } from './fetch-transport';
+import { alwaysReportStrategy } from '../report-strategies/report-strategies';
 
 describe('ErrTracker', () => {
+  const reportStrategy = alwaysReportStrategy;
+
   it('should be defined', () => {
     expect(objToArray).toBeDefined();
     expect(extractBasicDataFromErrorEvent).toBeDefined();
@@ -35,6 +38,7 @@ describe('ErrTracker', () => {
       url: 'https://url.com',
       builder: builder,
       logger: ConsoleLogger,
+      reportStrategy,
       transport: postData
     });
 
@@ -80,6 +84,7 @@ describe('ErrTracker', () => {
       url: 'https://url.com',
       builder: builder,
       logger: ConsoleLogger,
+      reportStrategy,
       transport
     });
 

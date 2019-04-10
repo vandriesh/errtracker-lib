@@ -3,7 +3,7 @@ import { SlackMessageBuilder } from './message-builders/slack-message-builder';
 import { getLogger } from './loggers/loggers';
 import { subscribeToEventListener } from './core/utils';
 import { postData } from './core/fetch-transport';
-import { alwaysReportStrategy } from './report-strategies/report-strategies';
+import { buildReportStrategy } from './report-strategies/report-first-strategy';
 
 interface Window {
   [key: string]: any;
@@ -23,7 +23,7 @@ interface Window {
       builder,
       logger,
       transport: postData,
-      reportStrategy: alwaysReportStrategy
+      reportStrategy: buildReportStrategy(scope.localStorage)
     });
   };
 })(window);

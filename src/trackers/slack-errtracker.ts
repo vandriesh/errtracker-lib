@@ -1,24 +1,4 @@
-import { ErrTrackerLogger } from '../loggers/loggers';
-
-export interface ErrorEventHandlerInterface {
-  handle(event: ErrorEvent): boolean;
-}
-
-export interface ErrTrackerHandler {
-  handle: (error: ErrorEvent, info?: string[]) => Promise<Response>;
-}
-
-export interface ErrTrackerBasicConfig {
-  useConsoleLogger: boolean;
-  logger?: ErrTrackerLogger;
-}
-
-export interface ErrTrackerConfig extends ErrTrackerBasicConfig {
-  token: string;
-  url: string;
-  details?: object;
-  apiURL?: string;
-}
+import { ErrTrackerBasicConfig } from '../core/ETErrorEvent';
 
 export interface ErrTrackerSlackConfig extends ErrTrackerBasicConfig {
   details?: object;

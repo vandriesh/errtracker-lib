@@ -1,23 +1,16 @@
-import { ErrTrackerConfig } from './trackers/slack-errtracker';
-import { ConsoleLogger, DummyLogger } from './loggers/loggers';
+import { ErrTrackerConfig, getAPIUrl } from './core/ETErrorEvent';
+import { getLogger } from './loggers/loggers';
 import { ETData, MessageBuilder } from './message-builders/message-builder';
 import { subscribeToEventListener, Window } from './core/utils';
 import { postData } from './core/fetch-transport';
+import { alwaysReportStrategy } from './report-strategies/report-strategies';
 
 (function(scope: Window) {
   const ERR_TRACKER = 'errtracker';
   scope[ERR_TRACKER] = (options: ErrTrackerConfig) => {
-    const { token, details, useConsoleLogger } = options;
-    let { logger = DummyLogger, apiURL } = options;
-
-    if (!apiURL) {
-      apiURL = 'https://errtracker.com/prod/api/v1/alerts';
-    }
-
-    if (useConsoleLogger) {
-      logger = ConsoleLogger;
-    }
-
+    const { token, details } = options;
+    const logger = getLogger(options);
+    const url = getAPIUrl(options);
     const basicData: ETData = {
       details,
       token,
@@ -26,6 +19,13 @@ import { postData } from './core/fetch-transport';
 
     const dataBuilder = new MessageBuilder(basicData);
 
-    subscribeToEventListener({ scope: scope, url: apiURL, builder: dataBuilder, logger: logger, transport: postData });
+    subscribeToEventListener({
+      scope: scope,
+      url,
+      builder: dataBuilder,
+      logger: logger,
+      transport: postData,
+      reportStrategy: alwaysReportStrategy
+    });
   };
 })(window);
