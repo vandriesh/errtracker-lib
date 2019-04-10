@@ -37,4 +37,30 @@ describe('SlackMessageBuilder', () => {
       ]
     } as ChatPostMessageArguments);
   });
+  it('should format error message with basic data', () => {
+    const errMsg: Partial<ErrorEvent> = {
+      colno: 1,
+      lineno: 1,
+      error: {},
+      filename: 'filename',
+      message: 'my error'
+    };
+
+    instance = new SlackMessageBuilder('zzz');
+    output = instance.build(errMsg);
+    expect(output).toEqual({
+      text: inputMsg,
+      attachments: [
+        {
+          text: [
+            `colno: ${errMsg.colno}`,
+            `error: ${{}}`,
+            `filename: ${errMsg.filename}`,
+            `lineno: ${errMsg.lineno}`,
+            `message: ${errMsg.message}`
+          ].join('\n')
+        }
+      ]
+    } as ChatPostMessageArguments);
+  });
 });
