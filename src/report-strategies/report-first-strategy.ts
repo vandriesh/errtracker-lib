@@ -20,3 +20,5 @@ export const buildReportStrategy = (localStorage: Storage): ReportStrategy => {
     }
   };
 };
+
+export const browserBasedReportStrategy = buildReportStrategy(window.localStorage);

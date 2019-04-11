@@ -30,7 +30,7 @@ export interface ErrTrackerConfig extends ErrTrackerBasicConfig {
 
 export const getAPIUrl = ({ apiURL }: ErrTrackerConfig) => {
   if (!apiURL) {
-    return 'https://errtracker.com/prod/api/v1/alerts';
+    return 'https://errtracker.com/api/v1/alerts';
   }
 
   return apiURL;

@@ -1,29 +1,7 @@
-import { ErrTrackerSlackConfig } from './trackers/slack-errtracker';
-import { SlackMessageBuilder } from './message-builders/slack-message-builder';
-import { getLogger } from './loggers/loggers';
-import { subscribeToEventListener } from './core/utils';
-import { postData } from './core/fetch-transport';
+import { buildSlackErrorTracker } from './trackers/slack-errtracker';
 import { alwaysReportStrategy } from './report-strategies/report-strategies';
 
-interface Window {
-  [key: string]: any;
-}
+export const slackErrTracker = buildSlackErrorTracker(alwaysReportStrategy, window);
 
-(function(scope: Window) {
-  const ERR_TRACKER = 'slackErrTracker';
-
-  scope[ERR_TRACKER] = (options: ErrTrackerSlackConfig) => {
-    const { details, webHookUrl } = options;
-    const logger = getLogger(options);
-    const builder = new SlackMessageBuilder('We got an error!', details);
-
-    subscribeToEventListener({
-      scope,
-      url: webHookUrl,
-      builder,
-      logger,
-      transport: postData,
-      reportStrategy: alwaysReportStrategy
-    });
-  };
-})(window);
+// @ts-ignore
+window['slackErrTracker'] = slackErrTracker;
