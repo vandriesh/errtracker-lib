@@ -1,10 +1,16 @@
-import { objToArray, extractBasicDataFromErrorEvent, subscribeToEventListener } from './utils';
+import {
+  objToArray,
+  extractBasicDataFromErrorEvent,
+  buildEventHandler,
+  addWindowEventListener,
+  ETErrorEventHandler
+} from './utils';
 import { MessageBuilder } from '../message-builders/message-builder';
-import { ConsoleLogger } from '../loggers/loggers';
-import { postData } from './fetch-transport';
+import { ConsoleLogger, getLogger } from '../loggers/loggers';
 import { alwaysReportStrategy } from '../report-strategies/report-strategies';
+import { ETErrorEvent } from './ETErrorEvent';
 
-describe('ErrTracker', () => {
+describe('Utils', () => {
   const reportStrategy = alwaysReportStrategy;
 
   it('should be defined', () => {
@@ -27,89 +33,131 @@ describe('ErrTracker', () => {
     expect(out.error).toBeDefined();
   });
 
-  it('should 1. subscribe to scope', () => {
-    const scope = {
-      addEventListener: jest.fn().mockImplementation()
-    };
-    const builder = new MessageBuilder({ token: 'qwe', url: 'https://1.com' });
+  it('should call addEventListener with provided errorEvent handler', () => {
+    jest.spyOn(window, 'addEventListener');
+    const mockHandler = jest.fn();
+    addWindowEventListener(mockHandler);
 
-    subscribeToEventListener({
-      scope: scope,
-      url: 'https://url.com',
-      builder: builder,
-      logger: ConsoleLogger,
-      reportStrategy,
-      transport: postData
-    });
-
-    expect(scope.addEventListener).toHaveBeenCalledWith('error', expect.any(Function));
+    expect(window.addEventListener).toHaveBeenCalledWith('error', mockHandler);
   });
 
-  it('should 2. subscribe, build, post and log about sending data', () => {
-    let handler = jest.fn();
-    const scope = {
-      addEventListener: (event: any, fn: any) => (handler = fn)
-    };
+  describe('Build, post process', () => {
+    let handler: ETErrorEventHandler;
+    let builder: MessageBuilder;
 
-    expect(handler).not.toBeUndefined();
+    beforeEach(() => {
+      builder = new MessageBuilder({ token: 'qwe', url: 'https://1.com' });
+      const transport = jest.fn().mockResolvedValue('qwe');
 
-    const builder = new MessageBuilder({ token: 'qwe', url: 'https://1.com' });
-    const mockFetchPromise = Promise.resolve('ok');
-    const thenMock = jest.fn().mockImplementation(() => mockFetchPromise);
+      jest.spyOn(builder, 'build');
 
-    const transport = jest.fn().mockImplementation(() => {
-      return {
-        then: thenMock
-      };
-    });
-
-    builder.build = jest.fn().mockImplementation((data) => {
-      expect(data).toEqual({
-        lineno: 1,
-        colno: 1,
-        message: 'my error',
-        error: 'my error',
-        filename: 'filename.js'
+      console.log = jest.fn().mockImplementation((...args) => {
+        expect(args[0]).toEqual('ErrTracker:ok');
+        expect(args[1]).toEqual('qwe1');
       });
 
-      return {
-        ...data,
-        token: 'qwe',
-        url: 'https://1.com'
-      };
+      handler = buildEventHandler({
+        url: 'https://url.com',
+        builder: builder,
+        logger: ConsoleLogger,
+        reportStrategy,
+        transport
+      });
+      jest.spyOn(builder, 'build');
     });
 
-    subscribeToEventListener({
-      scope,
-      url: 'https://url.com',
-      builder: builder,
-      logger: ConsoleLogger,
-      reportStrategy,
-      transport
-    });
+    it('should post request and check success response is handled', () => {
+      const transport = jest.fn().mockResolvedValue('success');
 
-    expect(handler).toBeDefined();
+      console.log = jest.fn().mockImplementation((...args) => {
+        expect(args[0]).toEqual('ErrTracker:ok');
+        expect(args[1]).toEqual('success');
+      });
 
-    expect(transport).not.toHaveBeenCalled();
+      const handler = buildEventHandler({
+        url: 'https://url.com',
+        builder: builder,
+        logger: ConsoleLogger,
+        reportStrategy,
+        transport
+      });
 
-    if (typeof handler === 'function') {
       handler({
         lineno: 1,
         colno: 1,
         message: 'my error',
         error: 'my error',
         filename: 'filename.js'
-      });
-    }
+      } as ErrorEvent);
 
-    expect(transport).toHaveBeenCalledWith('https://url.com', {
-      colno: 1,
-      error: 'my error',
-      filename: 'filename.js',
-      lineno: 1,
-      message: 'my error',
-      token: 'qwe',
-      url: 'https://1.com'
+      expect(builder.build).toHaveBeenCalledWith(expect.any(Object));
+
+      expect(transport).toHaveBeenCalledWith('https://url.com', {
+        colno: 1,
+        error: 'my error',
+        filename: 'filename.js',
+        lineno: 1,
+        message: 'my error',
+        token: 'qwe',
+        url: 'https://1.com'
+      });
+    });
+
+    it('should post request and check error response is handled', () => {
+      const transport = jest.fn().mockRejectedValue('error');
+
+      console.warn = jest.fn().mockImplementation((...args) => {
+        expect(args[0]).toEqual('ErrTracker:fail');
+        expect(args[1]).toEqual('error');
+      });
+
+      const handler = buildEventHandler({
+        url: 'https://url.com',
+        builder: builder,
+        logger: ConsoleLogger,
+        reportStrategy,
+        transport
+      });
+
+      handler({
+        lineno: 1,
+        colno: 1,
+        message: 'my error',
+        error: 'my error',
+        filename: 'filename.js'
+      } as ErrorEvent);
+
+      expect(transport).toHaveBeenCalledWith('https://url.com', {
+        colno: 1,
+        error: 'my error',
+        filename: 'filename.js',
+        lineno: 1,
+        message: 'my error',
+        token: 'qwe',
+        url: 'https://1.com'
+      });
+    });
+
+    it('should not post request if nothing to report', () => {
+      reportStrategy.toReport = jest.fn().mockReturnValue(false);
+      const transport = jest.fn();
+      const handler = buildEventHandler({
+        url: 'https://url.com',
+        builder: builder,
+        logger: ConsoleLogger,
+        reportStrategy,
+        transport
+      });
+
+      handler({
+        lineno: 1,
+        colno: 1,
+        message: 'my error',
+        error: 'my error',
+        filename: 'filename.js'
+      } as ErrorEvent);
+
+      expect(transport).not.toHaveBeenCalled();
     });
   });
 });

@@ -26,7 +26,6 @@ export interface Window {
 }
 
 export interface SubscribeParams {
-  scope: Window;
   url: string;
   builder: ETBuilder;
   transport: TransportContract;
@@ -34,10 +33,12 @@ export interface SubscribeParams {
   reportStrategy: ReportStrategy;
 }
 
-export const subscribeToEventListener = (config: SubscribeParams) => {
-  const { scope, url, builder, logger, transport, reportStrategy } = config;
+export type ETErrorEventHandler = (errEvent: ErrorEvent) => void;
 
-  scope.addEventListener('error', (event: ErrorEvent) => {
+export const buildEventHandler = (config: SubscribeParams): ETErrorEventHandler => {
+  const { url, builder, logger, transport, reportStrategy } = config;
+
+  return (event: ErrorEvent) => {
     const errorEvent = extractBasicDataFromErrorEvent(event);
 
     if (!reportStrategy.toReport(event)) {
@@ -47,5 +48,8 @@ export const subscribeToEventListener = (config: SubscribeParams) => {
     transport(url, builder.build(errorEvent))
       .then((resp) => logger.success('ErrTracker:ok', resp))
       .catch((resp) => logger.error('ErrTracker:fail', resp));
-  });
+  };
 };
+
+export const addWindowEventListener = (eventHandlerFn: ETErrorEventHandler) =>
+  window.addEventListener('error', eventHandlerFn);

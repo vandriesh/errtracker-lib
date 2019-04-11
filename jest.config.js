@@ -10,6 +10,7 @@ module.exports = {
   ],
   'coveragePathIgnorePatterns': [
     '/node_modules/',
+    '/src/bootstrap/'
   ],
   'coverageThreshold': {
     'global': {

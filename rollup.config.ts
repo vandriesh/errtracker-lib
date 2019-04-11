@@ -11,7 +11,7 @@ import { uglify } from 'rollup-plugin-uglify';
 // @ts-ignore
 function buildOptions(libraryName) {
   return {
-    input: `src/${libraryName}.ts`,
+    input: `src/bootstrap/${libraryName}.ts`,
     output: [
       // { file: pkg.main, name: camelCase(libraryName), format: 'umd', sourcemap: true },
       // { file: pkg.module, format: 'es', sourcemap: true }
@@ -65,5 +65,6 @@ function buildWithMinOptions(libraryName) {
 }
 const rollupOptions = buildWithMinOptions('errtracker-lib');
 const slackOptions = buildWithMinOptions('errtracker-slack-lib');
+const uniqueSlackOptions = buildWithMinOptions('errtracker-unique-slack-lib');
 
-export default [...slackOptions, ...rollupOptions];
+export default [...slackOptions, ...rollupOptions, ...uniqueSlackOptions];

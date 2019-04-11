@@ -1,25 +1,25 @@
-import { subscribeToEventListener } from './core/utils';
-import { ConsoleLogger, DummyLogger } from './loggers/loggers';
-import { ErrTrackerSlackConfig } from './trackers/slack-errtracker';
-import { browserBasedReportStrategy } from './report-strategies/report-first-strategy';
-import { uniqueSlackErrTracker } from './errtracker-unique-slack-lib';
+import { buildEventHandler } from '../core/utils';
+import { ConsoleLogger, DummyLogger } from '../loggers/loggers';
+import { buildSlackErrorTracker, ErrTrackerSlackConfig } from './slack-errtracker';
+import { browserBasedReportStrategy } from '../report-strategies/report-first-strategy';
 
 describe('Unique Slack ErrTracker Library', () => {
-  it('should be defined', () => {
-    expect(uniqueSlackErrTracker).toBeDefined();
+  let uniqueSlackErrTracker: any;
+
+  beforeEach(() => {
+    // @ts-ignore
+    buildEventHandler = jest.fn();
+
+    uniqueSlackErrTracker = buildSlackErrorTracker(browserBasedReportStrategy);
   });
 
   it('should build listener with specific params (with dummy logger)', () => {
-    // @ts-ignore
-    subscribeToEventListener = jest.fn();
-
     uniqueSlackErrTracker({
       webHookUrl: 'http://webhook.url',
       details: { qwe: 'qwe', asd: 'asd' }
     } as ErrTrackerSlackConfig);
 
-    expect(subscribeToEventListener).toHaveBeenCalledWith({
-      scope: window,
+    expect(buildEventHandler).toHaveBeenCalledWith({
       url: 'http://webhook.url',
       builder: expect.any(Object),
       logger: DummyLogger,
@@ -29,17 +29,13 @@ describe('Unique Slack ErrTracker Library', () => {
   });
 
   it('should build listener with specific params (with console logger)', () => {
-    // @ts-ignore
-    subscribeToEventListener = jest.fn();
-
     uniqueSlackErrTracker({
       webHookUrl: 'http://webhook.url',
       details: { qwe: 'qwe', asd: 'asd' },
       useConsoleLogger: true
     } as ErrTrackerSlackConfig);
 
-    expect(subscribeToEventListener).toHaveBeenCalledWith({
-      scope: window,
+    expect(buildEventHandler).toHaveBeenCalledWith({
       url: 'http://webhook.url',
       builder: expect.any(Object),
       logger: ConsoleLogger,
