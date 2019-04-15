@@ -1,4 +1,4 @@
-import { postData } from './fetch-transport';
+import { corsPostData, postData } from './fetch-transport';
 
 const globalAny: any = global;
 /**
@@ -45,7 +45,35 @@ describe('Transport', () => {
       credentials: 'omit',
       headers: {
         'Content-Type': 'application/json; charset=utf-8'
-        // "Content-Type": "application/x-www-form-urlencoded",
+      },
+      redirect: 'follow',
+      referrer: 'no-referrer',
+      body: JSON.stringify(data) // body data type must match "Content-Type" header
+    });
+  });
+
+  it('it should fetch with cors parameters', (done) => {
+    const mockSuccessResponse = { a: 1, b: 2 };
+
+    const data = { x: 1, y: 2, z: 3 };
+
+    // tslint:disable-next-line:no-floating-promises
+    corsPostData('/url', data).then((res: Response) => {
+      const body: any = res.json();
+      expect(body).toEqual(mockSuccessResponse);
+      done();
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    // assert on the times called and arguments given to fetch
+    expect(fetch).toHaveBeenCalledWith('/url', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'omit',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8'
       },
       redirect: 'follow',
       referrer: 'no-referrer',
@@ -60,8 +88,32 @@ describe('Transport', () => {
       done();
     });
 
+    expect(fetch).toHaveBeenCalledTimes(0);
+  });
+
+  it('should return immediate resolve object if url is not provided', (done) => {
     // tslint:disable-next-line:no-floating-promises
     postData('', undefined).then((resp) => {
+      expect(resp).toEqual({});
+      done();
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(0);
+  });
+
+  it('should return immediate resolve object if url is not provided', (done) => {
+    // tslint:disable-next-line:no-floating-promises
+    corsPostData('').then((resp) => {
+      expect(resp).toEqual({});
+      done();
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(0);
+  });
+
+  it('should return immediate resolve object if url is not provided', (done) => {
+    // tslint:disable-next-line:no-floating-promises
+    corsPostData('', undefined).then((resp) => {
       expect(resp).toEqual({});
       done();
     });

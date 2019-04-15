@@ -1,8 +1,10 @@
 <html>
   <script src="../dist/errtracker-unique-slack-lib.es5.js"></script>
   <script>
-    if (window['uniqueSlackErrTracker']) {
       (function(et, d, n) {
+        if (!et) {
+          return
+        }
         et({
           webHookUrl: 'https://hooks.slack.com/services/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',
           details: {
@@ -11,11 +13,13 @@
             url: d.location
           }
         });
-      })(window['uniqueSlackErrTracker'], window.document, window.navigator);
-    }
+      })(uniqueSlackErrTracker, window.document, window.navigator);
 
-    function triggerError() {
-      throw 'my unique error!';
+    function triggerError1() {
+      throw 'my #1 unique error!';
+    }
+    function triggerError2() {
+      throw 'my #2 unique error!';
     }
   </script>
   <body>
@@ -27,6 +31,7 @@
 
     <hr />
 
-    <input type="button" onclick="triggerError()" value="send Unique notification" />
+    <input type="button" onclick="triggerError1()" value="send Unique notification #1" />
+    <input type="button" onclick="triggerError2()" value="send Unique notification #2" />
   </body>
 </html>
