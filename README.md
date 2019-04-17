@@ -56,7 +56,6 @@
 ```html
 <script src="/path/to/errtracker-unique-slack-lib.es5.js"></script>
 <script>
-  // make sure 
   (function(et, d, n) {
     if (!et) {
       return
