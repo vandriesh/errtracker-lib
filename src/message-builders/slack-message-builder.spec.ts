@@ -20,6 +20,7 @@ describe('SlackMessageBuilder', () => {
 
     output = instance.build(errMsg);
     expect(output).toEqual({
+      username: 'errtracker',
       text: inputMsg,
       attachments: [
         {
@@ -37,6 +38,7 @@ describe('SlackMessageBuilder', () => {
       ]
     } as ChatPostMessageArguments);
   });
+
   it('should format error message with basic data', () => {
     const errMsg: Partial<ErrorEvent> = {
       colno: 1,
@@ -49,6 +51,7 @@ describe('SlackMessageBuilder', () => {
     instance = new SlackMessageBuilder('zzz');
     output = instance.build(errMsg);
     expect(output).toEqual({
+      username: 'errtracker',
       text: inputMsg,
       attachments: [
         {

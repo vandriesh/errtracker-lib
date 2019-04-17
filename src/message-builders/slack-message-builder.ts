@@ -61,6 +61,7 @@ export class SlackMessageBuilder implements ETMessageBuilder<ChatPostMessageArgu
     }
 
     return {
+      username: 'errtracker',
       text: this.slackMessage,
       attachments
     } as ChatPostMessageArguments;
