@@ -27,6 +27,7 @@
 |------------------|--------|-----------|-----------------------------------|
 | token            | string | true      | id to store error                 |
 | useConsoleLogger | boolean| false     | report about server side response, can provide custom logger |
+| url              | string | false     | where error was thrown            |
 | details          | object | false     | details you might need to provide |
 
 ## Config samples
