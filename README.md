@@ -33,7 +33,7 @@
 
 ### Slack every error report
 ```html
-  <script src="../dist/errtracker-slack-lib.es5.js"></script>
+  <script src="/path/to/errtracker-slack-lib.es5.js"></script>
   <script>
     (function(et, d, n) {
       if (!et) {
@@ -41,14 +41,14 @@
       }
 
       et({
-        webHookUrl: 'https://hooks.slack.com/services/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',
+        webHookUrl: 'https://hooks.slack.com/services/some_unique_id'',
         details: {
           platform: n.platform,
           userAgent: n.userAgent,
           url: d.location
         }
       });
-    })(slackErrTracker, window.document, window.navigator);
+    })(window['slackErrTracker'], window.document, window.navigator);
   </script>
 ```
 
@@ -71,7 +71,7 @@
         url: d.location
       }
     });
-  })(uniqueSlackErrTracker, window.document, window.navigator);
+  })(window['uniqueSlackErrTracker'], window.document, window.navigator);
 </script>
 ```
 
@@ -96,6 +96,6 @@
       userAgent: n.userAgent
     }
   });
-})(window.errtracker, window.document, window.navigator);
+})(window['errtracker'], window.document, window.navigator);
 </script>
 ```
