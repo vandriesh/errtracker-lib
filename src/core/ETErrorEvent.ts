@@ -22,6 +22,7 @@ export interface ErrTrackerBasicConfig {
 }
 
 export interface ErrTrackerConfig extends ErrTrackerBasicConfig {
+  apiKey: string;
   token: string;
   url: string;
   details?: object;

@@ -3,7 +3,7 @@ import { ReportStrategy } from '../report-strategies/report-strategies';
 import { getLogger } from '../loggers/loggers';
 import { ETData, MessageBuilder } from '../message-builders/message-builder';
 import { addWindowEventListener, buildEventHandler } from '../core/utils';
-import { corsPostData } from '../core/fetch-transport';
+import { buildCorsTransporter } from '../core/fetch-transport';
 
 export const buildErrorTracker = (reportStrategy: ReportStrategy) => {
   return (options: ErrTrackerConfig) => {
@@ -16,12 +16,13 @@ export const buildErrorTracker = (reportStrategy: ReportStrategy) => {
       url: window.document.location.href
     };
     const builder = new MessageBuilder(basicData);
+    const transport = buildCorsTransporter(options);
 
     const eventHandler = buildEventHandler({
       url,
       builder,
       logger,
-      transport: corsPostData,
+      transport,
       reportStrategy
     });
 

@@ -3,7 +3,7 @@ import { ReportStrategy } from '../report-strategies/report-strategies';
 import { getLogger } from '../loggers/loggers';
 import { SlackMessageBuilder } from '../message-builders/slack-message-builder';
 import { addWindowEventListener, buildEventHandler } from '../core/utils';
-import { postData } from '../core/fetch-transport';
+import { buildNoCorsTransporter } from '../core/fetch-transport';
 
 export interface ErrTrackerSlackConfig extends ErrTrackerBasicConfig {
   details?: object;
@@ -15,12 +15,13 @@ export const buildSlackErrorTracker = (reportStrategy: ReportStrategy) => {
     const { details, webHookUrl } = options;
     const logger = getLogger(options);
     const builder = new SlackMessageBuilder('We got an error!', details);
+    const transport = buildNoCorsTransporter();
 
     const slackEventHandler = buildEventHandler({
       url: webHookUrl,
       builder,
       logger,
-      transport: postData,
+      transport,
       reportStrategy
     });
 

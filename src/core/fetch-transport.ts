@@ -1,39 +1,61 @@
+import { ErrTrackerConfig } from './ETErrorEvent';
+
 export type TransportContract = (url: string, data?: object) => Promise<Response>;
 
-export const postData: TransportContract = (url, data = {}) => {
-  if (!url) {
-    return Promise.resolve({} as Response);
-  }
-
-  return fetch(url, {
-    method: 'POST',
-    mode: 'no-cors',
-    cache: 'no-cache',
-    credentials: 'omit',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8'
-    },
-    redirect: 'follow',
-    referrer: 'no-referrer',
-    body: JSON.stringify(data)
-  });
+export const buildHeaders = ({ apiKey }: ErrTrackerConfig) => {
+  return {
+    'Content-Type': 'application/json; charset=utf-8',
+    'x-api-key': apiKey
+  };
 };
 
-export const corsPostData: TransportContract = (url, data = {}) => {
-  if (!url) {
-    return Promise.resolve({} as Response);
-  }
+export enum ET_FETCH_MODES {
+  CORS = 'cors',
+  NO_CORS = 'no-cors'
+}
 
-  return fetch(url, {
+export const buildTransporterProperties = (mode: ET_FETCH_MODES): RequestInit => {
+  return {
     method: 'POST',
-    mode: 'cors',
+    mode,
     cache: 'no-cache',
     credentials: 'omit',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8'
-    },
     redirect: 'follow',
-    referrer: 'no-referrer',
-    body: JSON.stringify(data)
-  });
+    referrer: 'no-referrer'
+  };
+};
+
+export const buildCorsTransporter = (config: ErrTrackerConfig): TransportContract => {
+  const headers = buildHeaders(config);
+  const transporterConfig = buildTransporterProperties(ET_FETCH_MODES.CORS);
+
+  return (url, data) => {
+    if (!url) {
+      return Promise.resolve({} as Response);
+    }
+
+    return fetch(url, {
+      ...transporterConfig,
+      headers,
+      body: JSON.stringify(data)
+    });
+  };
+};
+
+export const buildNoCorsTransporter = (): TransportContract => {
+  const transporterConfig = buildTransporterProperties(ET_FETCH_MODES.NO_CORS);
+
+  return (url, data) => {
+    if (!url) {
+      return Promise.resolve({} as Response);
+    }
+
+    return fetch(url, {
+      ...transporterConfig,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: JSON.stringify(data)
+    });
+  };
 };

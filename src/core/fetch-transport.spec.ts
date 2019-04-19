@@ -1,4 +1,5 @@
-import { corsPostData, postData } from './fetch-transport';
+import { buildCorsTransporter, buildNoCorsTransporter, TransportContract } from './fetch-transport';
+import { ErrTrackerConfig } from './ETErrorEvent';
 
 const globalAny: any = global;
 /**
@@ -7,6 +8,8 @@ const globalAny: any = global;
 describe('Transport', () => {
   let mockSuccessResponse: object;
   let mockFetchPromise: Promise<object>;
+  let postData: TransportContract;
+  let corsPostData: TransportContract;
 
   beforeEach(() => {
     mockSuccessResponse = { a: 1, b: 2 };
@@ -14,11 +17,16 @@ describe('Transport', () => {
       json: () => mockSuccessResponse
     });
     globalAny.fetch = jest.fn().mockImplementation(() => mockFetchPromise); // 4;
+    postData = buildNoCorsTransporter();
+    corsPostData = buildCorsTransporter({
+      apiKey: 'xxxx-xxxx-xxxx'
+    } as ErrTrackerConfig);
   });
 
   afterEach(() => {
     globalAny.fetch.mockClear();
   });
+
   it('should be defined', () => {
     expect(postData).toBeDefined();
   });
@@ -73,7 +81,8 @@ describe('Transport', () => {
       cache: 'no-cache',
       credentials: 'omit',
       headers: {
-        'Content-Type': 'application/json; charset=utf-8'
+        'Content-Type': 'application/json; charset=utf-8',
+        'x-api-key': 'xxxx-xxxx-xxxx'
       },
       redirect: 'follow',
       referrer: 'no-referrer',
