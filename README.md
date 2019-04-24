@@ -43,7 +43,7 @@
       }
 
       et({
-        webHookUrl: 'https://hooks.slack.com/services/some_unique_id'',
+        webHookUrl: 'https://hooks.slack.com/services/some_unique_id',
         details: {
           platform: n.platform,
           userAgent: n.userAgent,
@@ -89,7 +89,7 @@
     // mandatory
     apiKey: 'xxxx-xxxx-xxxx',
     token: 'xxxxxx-xxxx-xx-xxx-xxxxxxxxx',
-    // the rest below are optional
+    // below are optional
     useConsoleLogger: true,
     url: d.location,
     details: {
