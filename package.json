@@ -39,6 +39,14 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "travis-deploy-once": "travis-deploy-once --pro"
   },
+  "release": {
+    "plugins": [
+      ["@semantic-release/npm", {
+        "__npmPublish": false,
+        "tarballDir": "dist"
+      }]
+    ]
+  },
   "lint-staged": {
     "{src,test}/**/*.ts": [
       "prettier --write",
