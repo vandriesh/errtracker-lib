@@ -1,6 +1,6 @@
 {
   "name": "errtracker-lib",
-  "version": "0.1.4",
+  "version": "0.1.3",
   "description": "A small lib to catch error and handle it.",
   "keywords": [
     "javascripts",
@@ -17,8 +17,8 @@
   ],
   "author": "Vitalie Andries <vitalie.andries@gmail.com>",
   "repository": {
-    "type": "git",
-    "url": ""
+    "type": "ssh",
+    "url": "git@github.com:vandriesh/errtracker-lib.git"
   },
   "license": "MIT",
   "engines": {
@@ -41,10 +41,13 @@
   },
   "release": {
     "plugins": [
-      ["@semantic-release/npm", {
-        "__npmPublish": false,
-        "tarballDir": "dist"
-      }]
+      [
+        "@semantic-release/npm",
+        {
+          "__npmPublish": false,
+          "pkgDir": "dist"
+        }
+      ]
     ]
   },
   "lint-staged": {
