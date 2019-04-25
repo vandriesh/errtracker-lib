@@ -1,6 +1,6 @@
 {
   "name": "errtracker-lib",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A small lib to catch error and handle it.",
   "keywords": [
     "javascripts",
