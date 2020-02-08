@@ -23,7 +23,9 @@ describe('Utils', () => {
   });
 
   it('should extract default error data', () => {
-    const ev = new ErrorEvent('ke');
+    const ev = new ErrorEvent('ke', {
+      error: new Error('foo')
+    });
     const out = extractBasicDataFromErrorEvent(ev);
 
     expect(out.lineno).toBeDefined();

@@ -5,7 +5,8 @@ export interface ETErrorEvent {
   filename: string;
   lineno: number;
   colno: number;
-  error: object;
+  error: Error;
+  stack?: string
 }
 
 export interface ErrorEventHandlerInterface {

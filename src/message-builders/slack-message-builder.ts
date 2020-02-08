@@ -1,4 +1,5 @@
 import { objToArray } from '../core/utils';
+import { version } from '../../package.json';
 
 export interface ChatPostMessageArguments {
   channel: string;
@@ -61,7 +62,7 @@ export class SlackMessageBuilder implements ETMessageBuilder<ChatPostMessageArgu
     }
 
     return {
-      username: 'errtracker',
+      username: `errtracker v.${version}`,
       text: this.slackMessage,
       attachments
     } as ChatPostMessageArguments;

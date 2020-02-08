@@ -1,4 +1,5 @@
 import { ChatPostMessageArguments, SlackMessageBuilder } from './slack-message-builder';
+import { version } from '../../package.json';
 
 describe('SlackMessageBuilder', () => {
   let instance: SlackMessageBuilder;
@@ -20,7 +21,7 @@ describe('SlackMessageBuilder', () => {
 
     output = instance.build(errMsg);
     expect(output).toEqual({
-      username: 'errtracker',
+      username: `errtracker v.${version}`,
       text: inputMsg,
       attachments: [
         {
@@ -51,7 +52,7 @@ describe('SlackMessageBuilder', () => {
     instance = new SlackMessageBuilder('zzz');
     output = instance.build(errMsg);
     expect(output).toEqual({
-      username: 'errtracker',
+      username: `errtracker v.${version}`,
       text: inputMsg,
       attachments: [
         {
