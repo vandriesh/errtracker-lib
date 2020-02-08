@@ -14,14 +14,15 @@ describe('Reporting Strategy: ReportFirst', () => {
     const filename = 'https://1.com/1.js';
     const lineno = 1;
     const colno = 13;
-    const errorEvent = { filename, lineno, colno, error: { zzz: 'zzz' }, message: 'qqq' };
+    const errorEvent = { filename, lineno, colno, error: new Error('zzz'), message: 'qqq' };
     const outId = getErrorEventId(errorEvent);
 
     expect(outId).toEqual(`${filename}:${lineno}:${colno}`);
   });
 
   it('should return if event should be reported', () => {
-    const errorEvent = { filename, lineno, colno, error: { zzz: 'zzz' }, message: 'qqq' };
+    let error = new Error('zzz');
+    const errorEvent = { filename, lineno, colno, error, message: 'qqq' };
     const firstOfItsKindReportStrategy = buildReportStrategy(window.localStorage);
 
     const report1 = firstOfItsKindReportStrategy.toReport(errorEvent);

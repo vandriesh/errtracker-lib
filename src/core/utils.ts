@@ -11,14 +11,24 @@ export const objToArray = (obj: any): string[] =>
 
 export const extractBasicDataFromErrorEvent = (err: ErrorEvent): ETErrorEvent => {
   const { colno, error, message, lineno, filename } = err;
+  const stack = error.stack;
 
-  return {
+  const defaultProps = {
     colno,
     error,
     message,
     lineno,
     filename
   };
+
+  if (stack) {
+    return {
+      ...defaultProps,
+      stack
+    }
+  }
+
+  return defaultProps
 };
 
 export interface Window {

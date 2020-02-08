@@ -9,7 +9,8 @@ describe('LocalStorage', () => {
     lineno: 13,
     colno: 1,
     filename: 'qqq',
-    error: { error: 'error' },
+    error: { message: 'error', name: 'Foo' },
+    stack: 'foo: 1\n bar: 2',
     message: 'message'
   };
 
