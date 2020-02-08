@@ -5,7 +5,6 @@ cache:
 notifications:
   email: false
 node_js:
-  - '11'
   - '12'
 script:
   - npm run test:prod && npm run build
@@ -27,4 +26,4 @@ jobs:
       deploy:
         provider: npm
         api_key: $NPM_TOKEN
-        on: deploy-npm-release
+        on: master
