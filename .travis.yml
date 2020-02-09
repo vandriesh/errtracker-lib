@@ -20,10 +20,3 @@ jobs:
     - stage: Produce Coverage
       node_js: node
       script: jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
-    - stage: NPM release
-      node_js: "12"
-      script: echo "Deploying to npm ..."
-      deploy:
-        provider: npm
-        api_key: $NPM_TOKEN
-        on: master
